@@ -1,6 +1,26 @@
 <template>
     <div class="bg-black text-white flex-1 ml-56 px-10">
-        <h1>This is an home page</h1>
+
+        <div class="flex flex-wrap -mx-2 mb-8">
+            <div class="w-full lg:w-1/2 px-2">
+                <div class="border h-screen text-sm text-grey-dark flex items-center justify-center">
+                    <iframe src="https://ritmoromantica.pe/radioenvivo" class="w-full h-full"></iframe>
+                </div>
+            </div>
+            <div class="w-full lg:w-1/2 px-2">
+                <div class="w-full mb-4">
+                    <div class="border h-full text-sm text-grey-dark flex items-center justify-center" style="height: 22rem;">
+                        <iframe src="https://translate.google.com/" class="w-full h-full"></iframe>
+                    </div>
+                </div>
+                <div class="w-full">
+                    <div class="border h-full text-sm text-grey-dark flex items-center justify-center" style="height: 22rem;">
+                        <iframe src="https://dict.naver.com/eskodict/#/main" class="w-full h-full"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
