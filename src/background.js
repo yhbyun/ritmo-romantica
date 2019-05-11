@@ -19,6 +19,15 @@ function createWindow () {
     win = new BrowserWindow({ width: 1200, height: 750, titleBarStyle: 'hiddenInset' })
     win.setOpacity(0.98)
 
+    // ignore x-frame-options
+    win.webContents.session.webRequest.onHeadersReceived({}, (detail, callback) => {
+        const xFrameOriginKey = Object.keys(detail.responseHeaders).find(header => String(header).match(/^x-frame-options$/i))
+        if (xFrameOriginKey) {
+            delete detail.responseHeaders[xFrameOriginKey]
+        }
+        callback({ cancel: false, responseHeaders: detail.responseHeaders })
+    })
+
     if (isDevelopment) {
         // Load the url of the dev server if in development mode
         win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -30,6 +39,7 @@ function createWindow () {
     }
 
     win.on('closed', () => {
+        win.removeAllListeners()
         win = null
     })
 }
