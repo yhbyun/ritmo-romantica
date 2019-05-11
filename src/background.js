@@ -28,6 +28,12 @@ function createWindow () {
         callback({ cancel: false, responseHeaders: detail.responseHeaders })
     })
 
+    // change user agent
+    win.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+        details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (iPad; CPU OS 9_1 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/73.0.3683.103 Mobile/13B143 Safari/601.1.46'
+        callback({ cancel: false, requestHeaders: details.requestHeaders })
+    })
+
     if (isDevelopment) {
         // Load the url of the dev server if in development mode
         win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
