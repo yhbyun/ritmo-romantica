@@ -1,5 +1,6 @@
 'use strict'
 
+import path from 'path'
 import { app, protocol, BrowserWindow } from 'electron'
 import {
     createProtocol,
@@ -12,11 +13,18 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 let win
 
 // Standard scheme must be registered before the app is ready
-protocol.registerStandardSchemes(['app'], { secure: true })
+protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true, standard: true } }])
 
 function createWindow () {
     // Create the browser window.
-    win = new BrowserWindow({ width: 1200, height: 750, titleBarStyle: 'hiddenInset' })
+    win = new BrowserWindow({
+        width: 1200,
+        height: 750,
+        titleBarStyle: 'hiddenInset',
+        webPreferences: {
+            nodeIntegration: true
+        }
+    })
     win.setOpacity(0.98)
 
     // ignore x-frame-options
