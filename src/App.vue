@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import Sidebar from '@/components/sidebar.vue'
-import SidebarToggle from '@/components/sidebarToggle.vue'
+import Sidebar from '@/components/Sidebar.vue'
+import SidebarToggle from '@/components/SidebarToggle.vue'
 
 export default {
     components: {
