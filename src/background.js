@@ -22,7 +22,7 @@ function createWindow () {
         width: 1200,
         height: 750,
         icon: path.join(__static, 'icon.png'),
-        titleBarStyle: 'hiddenInset',
+        // titleBarStyle: 'hiddenInset',
         webPreferences: {
             nodeIntegration: true
         }
