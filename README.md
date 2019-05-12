@@ -4,20 +4,16 @@
 
 ## Project setup
 ```
-npm install
+yarn install
 ```
 
-### Compiles and hot-reloads for development
+### To start a Development Server
 ```
-npm run electron:serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
+yarn electron:serve
 ```
 
-### Lints and fixes files
+### To Build Your App 
 ```
-npm run lint
+yarn electron:build
 ```
+
