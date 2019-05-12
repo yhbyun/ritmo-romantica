@@ -79,3 +79,17 @@
  * @import "utilities/background-patterns";
  * @import "utilities/skew-transforms";
  */
+
+
+.h-72 {
+    height: 18rem;
+}
+
+.h-80 {
+    height: 20rem;
+}
+
+.h-88 {
+    height: 22rem;
+}
+
