@@ -1,11 +1,12 @@
 'use strict'
+/* global __static */
 
-import path from 'path'
 import { app, protocol, BrowserWindow } from 'electron'
 import {
     createProtocol,
     installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
+import path from 'path'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -20,6 +21,7 @@ function createWindow () {
     win = new BrowserWindow({
         width: 1200,
         height: 750,
+        icon: path.join(__static, 'icon.png'),
         titleBarStyle: 'hiddenInset',
         webPreferences: {
             nodeIntegration: true
