@@ -1,5 +1,9 @@
 <template>
+    <!--
     <div class="w-56 bg-grey-darkest text-white border-r border-blackblack fixed min-h-screen pt-8">
+    -->
+    <div :class="$style.sidebar">
+
         <div class="search-container text-center p-4 relative">
             <input type="text" placeholder="Search" class="bg-grey-darker text-grey-light text-xs w-full p-2 pl-8 border border-grey-dark rounded">
             <div class="absolute pin-t py-5 px-2 text-grey-light">
@@ -21,7 +25,45 @@
                 </svg>
                 <div class="text-white">Create</div>
             </div> <!-- end sidebar-icon -->
-
         </div>
+
     </div>
 </template>
+
+<script>
+    import {TweenMax, Power4} from 'gsap'
+    export default {
+        name: 'sidebar',
+        mounted () {
+            TweenMax.set(this.$el, {
+                x: this.$el.offsetWidth
+            })
+        },
+        computed: {
+            open () {
+                return this.$store.state.ui.sidebarOpen
+            }
+        },
+        watch: {
+            open: function (open) {
+                const dX = open ? 0 : this.$el.offsetWidth
+                TweenMax.to(this.$el, 0.6, {
+                    x: dX,
+                    ease: Power4.easeOut
+                })
+            }
+        }
+    }
+</script>
+
+<style module>
+    .sidebar{
+        position: fixed;
+        right: 0;
+        top: 0;
+        width: 300px;
+        height: 100vh;
+        max-width: 90vw;
+        background-color: var(--accent-color);
+    }
+</style>
