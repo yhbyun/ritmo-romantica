@@ -53,3 +53,12 @@ const notify = function (msg) {
         body: msg
     })
 }
+
+playControl = {
+    playSong() {
+        document.querySelector('#playButton').click();
+    },
+    pauseSong() {
+        document.querySelector('#pauseButton').click();
+    }
+}

@@ -43,7 +43,7 @@
 
 <script>
 import VueGridLayout from 'vue-grid-layout';
-import { remote } from 'electron'
+import { remote, ipcRenderer } from 'electron'
 
 const layout = [
     {"x":0,"y":0,"w":6,"h":18,"i":"0"},
@@ -70,6 +70,14 @@ export default {
         webview.addEventListener('dom-ready', () => {
             if (remote.process.env.NODE_ENV && remote.process.env.NODE_ENV !== 'production') {
                 webview.openDevTools()
+            }
+        })
+
+        ipcRenderer.on('play-control', (event, message) => {
+            if (message === 'play') {
+                webview.executeJavaScript('playControl.playSong()')
+            } else if (message === 'pause') {
+                webview.executeJavaScript('playControl.pauseSong()')
             }
         })
     },

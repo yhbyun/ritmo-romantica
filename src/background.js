@@ -1,7 +1,7 @@
 'use strict'
 /* global __static */
 
-import { app, protocol, BrowserWindow, ipcMain, Tray, nativeImage } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain, Menu, Tray, nativeImage } from 'electron'
 import {
     createProtocol,
     installVueDevtools
@@ -20,6 +20,20 @@ protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true
 function createTray() {
     tray = new Tray(nativeImage.createEmpty())
     tray.setToolTip('Ritmo Rómantica')
+
+    const contextMenu = Menu.buildFromTemplate([
+        { label: 'Play', click() { play() } },
+        { label: 'Pause', click() { pause() } },
+    ])
+    tray.setContextMenu(contextMenu)
+}
+
+function play() {
+    win.webContents.send('play-control', 'play')
+}
+
+function pause() {
+    win.webContents.send('play-control', 'pause')
 }
 
 function createWindow() {
