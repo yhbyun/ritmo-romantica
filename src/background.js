@@ -1,7 +1,7 @@
 'use strict'
 /* global __static */
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain, Tray, nativeImage } from 'electron'
 import {
     createProtocol,
     installVueDevtools
@@ -12,11 +12,17 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
+let tray
 
 // Standard scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true, standard: true } }])
 
-function createWindow () {
+function createTray() {
+    tray = new Tray(nativeImage.createEmpty())
+    tray.setToolTip('Ritmo Rómantica')
+}
+
+function createWindow() {
     // Create the browser window.
     win = new BrowserWindow({
         width: 1200,
@@ -31,18 +37,18 @@ function createWindow () {
     win.setOpacity(0.98)
 
     // ignore x-frame-options & contect-security-policy
-    win.webContents.session.webRequest.onHeadersReceived({}, (detail, callback) => {
-        const xFrameOriginKey = Object.keys(detail.responseHeaders).find(header => String(header).match(/^x-frame-options$/i))
-        if (xFrameOriginKey) {
-            delete detail.responseHeaders[xFrameOriginKey]
-        }
+    // win.webContents.session.webRequest.onHeadersReceived({}, (detail, callback) => {
+    //     const xFrameOriginKey = Object.keys(detail.responseHeaders).find(header => String(header).match(/^x-frame-options$/i))
+    //     if (xFrameOriginKey) {
+    //         delete detail.responseHeaders[xFrameOriginKey]
+    //     }
 
-        const contentSecurityPolicyKey = Object.keys(detail.responseHeaders).find(header => String(header).match(/^content-security-policy$/i))
-        if (contentSecurityPolicyKey) {
-            delete detail.responseHeaders[contentSecurityPolicyKey]
-        }
-        callback({ cancel: false, responseHeaders: detail.responseHeaders })
-    })
+    //     const contentSecurityPolicyKey = Object.keys(detail.responseHeaders).find(header => String(header).match(/^content-security-policy$/i))
+    //     if (contentSecurityPolicyKey) {
+    //         delete detail.responseHeaders[contentSecurityPolicyKey]
+    //     }
+    //     callback({ cancel: false, responseHeaders: detail.responseHeaders })
+    // })
 
     // change user agent
     win.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
@@ -91,6 +97,8 @@ app.on('ready', async () => {
         // Install Vue Devtools
         await installVueDevtools()
     }
+
+    createTray()
     createWindow()
 })
 
@@ -108,3 +116,7 @@ if (isDevelopment) {
         })
     }
 }
+
+ipcMain.on('song-updated', (event, arg) => {
+    tray.setTitle(arg)
+})

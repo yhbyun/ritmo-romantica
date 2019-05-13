@@ -16,6 +16,8 @@
 </template>
 
 <script>
+import { remote } from 'electron'
+
 export default {
     name: 'youtube',
     data: function () {
@@ -25,15 +27,11 @@ export default {
     },
     mounted () {
         const webview = document.querySelector('webview')
-        /*
-        webview.addEventListener("ipc-message", (event) => {
-            console.log("channel: " + event.channel)
-        })
-        */
 
         webview.addEventListener('dom-ready', () => {
-            webview.openDevTools()
-            // webview.send("ping")
+            if (remote.process.env.NODE_ENV && remote.process.env.NODE_ENV !== 'production') {
+                webview.openDevTools()
+            }
 
             webview.executeJavaScript('__myYoutubeTools.pauseVideo()')
         })

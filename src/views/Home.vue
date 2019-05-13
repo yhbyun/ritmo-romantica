@@ -17,13 +17,24 @@
                     :h="item.h"
                     :i="item.i">
             <div class="w-full h-full" v-if="item.i === '0'">
-                <iframe src="https://ritmoromantica.pe/radioenvivo" class="w-full h-full"></iframe>
+                <webview id="wv-radio" src="https://ritmoromantica.pe/radioenvivo"
+                    class="w-full h-full"
+                    :preload="preload"
+                    allowpopups
+                    ></webview>
             </div>
             <div class="w-full h-full" v-else-if="item.i === '1'">
-                <iframe src="https://translate.google.com/" class="w-full h-full"></iframe>
+                <webview src="https://translate.google.com/"
+                    class="w-full h-full"
+                    allowpopups
+                    ></webview>
             </div>
             <div class="w-full h-full" v-else-if="item.i === '2'">
-                <iframe src="https://dict.naver.com/eskodict/" class="w-full h-full"></iframe>
+                <webview src="https://dict.naver.com/eskodict/"
+                    class="w-full h-full"
+                    useragent="Mozilla/5.0 (iPad; CPU OS 9_1 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/73.0.3683.103 Mobile/13B143 Safari/601.1.46"
+                    allowpopups
+                    ></webview>
             </div>
         </grid-item>
     </grid-layout>
@@ -32,6 +43,7 @@
 
 <script>
 import VueGridLayout from 'vue-grid-layout';
+import { remote } from 'electron'
 
 const layout = [
     {"x":0,"y":0,"w":6,"h":18,"i":"0"},
@@ -48,8 +60,18 @@ export default {
     },
     data: function () {
         return {
-	        layout: layout,
+            layout: layout,
+            preload: `file:${require('path').resolve(__static, './radio-inject.js')}`,
         }
+    },
+    mounted () {
+        const webview = document.querySelector('#wv-radio')
+
+        webview.addEventListener('dom-ready', () => {
+            if (remote.process.env.NODE_ENV && remote.process.env.NODE_ENV !== 'production') {
+                webview.openDevTools()
+            }
+        })
     },
 }
 </script>
