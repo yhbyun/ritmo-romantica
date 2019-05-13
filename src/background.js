@@ -29,11 +29,16 @@ function createWindow () {
     })
     win.setOpacity(0.98)
 
-    // ignore x-frame-options
+    // ignore x-frame-options & contect-security-policy
     win.webContents.session.webRequest.onHeadersReceived({}, (detail, callback) => {
         const xFrameOriginKey = Object.keys(detail.responseHeaders).find(header => String(header).match(/^x-frame-options$/i))
         if (xFrameOriginKey) {
             delete detail.responseHeaders[xFrameOriginKey]
+        }
+
+        const contentSecurityPolicyKey = Object.keys(detail.responseHeaders).find(header => String(header).match(/^content-security-policy$/i))
+        if (contentSecurityPolicyKey) {
+            delete detail.responseHeaders[contentSecurityPolicyKey]
         }
         callback({ cancel: false, responseHeaders: detail.responseHeaders })
     })
