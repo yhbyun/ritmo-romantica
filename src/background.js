@@ -50,6 +50,8 @@ function createWindow() {
     })
     win.setOpacity(0.98)
 
+    alwaysOnTop()
+
     // ignore x-frame-options & contect-security-policy
     // win.webContents.session.webRequest.onHeadersReceived({}, (detail, callback) => {
     //     const xFrameOriginKey = Object.keys(detail.responseHeaders).find(header => String(header).match(/^x-frame-options$/i))
@@ -84,6 +86,20 @@ function createWindow() {
         win.removeAllListeners()
         win = null
     })
+}
+
+
+function alwaysOnTop() {
+    win.setOpacity(0.6)
+
+    // hides the dock icon for our app which allows our windows to join other
+    // apps' spaces. without this our windows open on the nearest "desktop" space
+    app.dock.hide()
+    // "floating" + 1 is higher than all regular windows, but still behind things
+    // like spotlight or the screen saver
+    win.setAlwaysOnTop(true, "floating", 1)
+    // allows the window to show over a fullscreen window
+    win.setVisibleOnAllWorkspaces(true)
 }
 
 // Quit when all windows are closed.
