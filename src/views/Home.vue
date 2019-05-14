@@ -45,6 +45,7 @@
 <script>
 import VueGridLayout from 'vue-grid-layout';
 import { remote, ipcRenderer } from 'electron'
+const { Menu, MenuItem } = remote
 
 const layout = [
     {"x":0,"y":0,"w":6,"h":18,"i":"0"},
@@ -64,6 +65,7 @@ export default {
             layout: layout,
             preloadRadio: `file:${require('path').resolve(__static, './radio-inject.js')}`,
             preloadGoogle: `file:${require('path').resolve(__static, './google-translate-inject.js')}`,
+            song: '', // singer + ' - ' + song
         }
     },
     mounted () {
@@ -81,7 +83,17 @@ export default {
                 webviewGoogle.openDevTools()
                 webviewGoogle.executeJavaScript('translate("hola")')
             }
-       })
+        })
+
+        // IPC
+        remote.ipcMain.on('radio-contextmenu', () => {
+            const menu = new Menu()
+            menu.append(new MenuItem({
+                label: 'Search this song in YouTube',
+                click: () => this.$router.push({ path: '/youtube', query: { search_query: this.song }}),
+            }))
+            menu.popup(remote.getCurrentWindow())
+        })
 
         ipcRenderer.on('play-control', (event, message) => {
             if (message === 'play') {
@@ -91,8 +103,12 @@ export default {
             }
         })
 
+        ipcRenderer.on('song-updated', (event, message) => {
+            this.song = message
+        })
+
         ipcRenderer.on('translate', (event, message) => {
-            webviewGoogle.executeJavaScript('translate("' + message.replace('"', '\"') + '")')
+            webviewGoogle.executeJavaScript('translate("' + message.replace('"', '\\"') + '")')
         })
     },
 }

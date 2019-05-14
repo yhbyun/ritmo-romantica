@@ -18,7 +18,7 @@ export default {
     },
     watch: {
         '$route' () {
-            this.$store.dispatch('toggleSidebar')
+            this.$store.dispatch('close')
         }
     }
 }

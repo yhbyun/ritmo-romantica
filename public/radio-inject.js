@@ -38,6 +38,9 @@ onload = () => {
         const msg = songMessage(artistElement.textContent, titleElement.textContent)
         notify(msg)
     }
+
+    // mouse right button click
+    document.addEventListener('contextmenu', () => ipcRenderer.send('radio-contextmenu'), false)
 }
 
 const songMessage = function (song, singer) {

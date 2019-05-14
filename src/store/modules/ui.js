@@ -15,6 +15,9 @@ const getters = {
 const actions = {
     toggleSidebar ({ commit, state }) {
         commit(types.TOGGLE_SIDEBAR)
+    },
+    close ({ commit, state }) {
+        commit('close')
     }
 }
 
@@ -22,6 +25,9 @@ const actions = {
 const mutations = {
     [types.TOGGLE_SIDEBAR] (state) {
         state.sidebarOpen = !state.sidebarOpen
+    },
+    close (state) {
+        state.sidebarOpen = false
     }
 }
 
