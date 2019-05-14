@@ -16,6 +16,8 @@
 </template>
 
 <script>
+/* global __static */
+
 import { remote, ipcRenderer } from 'electron'
 
 export default {

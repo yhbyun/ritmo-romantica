@@ -43,6 +43,8 @@
 </template>
 
 <script>
+/* global __static */
+
 import VueGridLayout from 'vue-grid-layout';
 import { remote, ipcRenderer } from 'electron'
 const { Menu, MenuItem } = remote
