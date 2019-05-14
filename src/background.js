@@ -17,6 +17,7 @@ let config = {
     transparency: false,
     opacity: 0.3,
     alwaysOnTop: false,
+    ignoreMouseEvent: false,
 }
 
 // Standard scheme must be registered before the app is ready
@@ -65,6 +66,16 @@ function createTray() {
             click: (item) => {
                 toggleAlwaysOnTop()
                 item.checked = config.alwaysOnTop
+            },
+        },
+        {
+            label: 'Disable Mouse',
+            type: 'checkbox',
+            checked: config.ignoreMouseEvent,
+            click: (item) => {
+                config.ignoreMouseEvent = !config.ignoreMouseEvent
+                win.setIgnoreMouseEvents(config.ignoreMouseEvent)
+                item.checked = config.ignoreMouseEvent
             },
         },
     ])
