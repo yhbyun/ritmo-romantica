@@ -50,7 +50,7 @@ function createWindow() {
     })
     win.setOpacity(0.98)
 
-    alwaysOnTop()
+    // alwaysOnTop()
 
     // ignore x-frame-options & contect-security-policy
     // win.webContents.session.webRequest.onHeadersReceived({}, (detail, callback) => {
@@ -149,4 +149,5 @@ if (isDevelopment) {
 
 ipcMain.on('song-updated', (event, arg) => {
     tray.setTitle(arg)
+    win.webContents.send('translate', arg.split('-')[1].trim())
 })

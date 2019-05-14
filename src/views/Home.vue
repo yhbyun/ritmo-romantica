@@ -19,13 +19,14 @@
             <div class="w-full h-full" v-if="item.i === '0'">
                 <webview id="wv-radio" src="https://ritmoromantica.pe/radioenvivo"
                     class="w-full h-full"
-                    :preload="preload"
+                    :preload="preloadRadio"
                     allowpopups
                     ></webview>
             </div>
             <div class="w-full h-full" v-else-if="item.i === '1'">
-                <webview src="https://translate.google.com/"
+                <webview id="wv-google-translate" src="https://translate.google.com/"
                     class="w-full h-full"
+                    :preload="preloadGoogle"
                     allowpopups
                     ></webview>
             </div>
@@ -61,24 +62,37 @@ export default {
     data: function () {
         return {
             layout: layout,
-            preload: `file:${require('path').resolve(__static, './radio-inject.js')}`,
+            preloadRadio: `file:${require('path').resolve(__static, './radio-inject.js')}`,
+            preloadGoogle: `file:${require('path').resolve(__static, './google-translate-inject.js')}`,
         }
     },
     mounted () {
-        const webview = document.querySelector('#wv-radio')
+        const webviewRadio = document.querySelector('#wv-radio')
+        const webviewGoogle = document.querySelector('#wv-google-translate')
 
-        webview.addEventListener('dom-ready', () => {
+        webviewRadio.addEventListener('dom-ready', () => {
             if (remote.process.env.NODE_ENV && remote.process.env.NODE_ENV !== 'production') {
-                webview.openDevTools()
+                webviewRadio.openDevTools()
             }
         })
 
+        webviewGoogle.addEventListener('dom-ready', () => {
+            if (remote.process.env.NODE_ENV && remote.process.env.NODE_ENV !== 'production') {
+                webviewGoogle.openDevTools()
+                webviewGoogle.executeJavaScript('translate("hola")')
+            }
+       })
+
         ipcRenderer.on('play-control', (event, message) => {
             if (message === 'play') {
-                webview.executeJavaScript('playControl.playSong()')
+                webviewRadio.executeJavaScript('playControl.playSong()')
             } else if (message === 'pause') {
-                webview.executeJavaScript('playControl.pauseSong()')
+                webviewRadio.executeJavaScript('playControl.pauseSong()')
             }
+        })
+
+        ipcRenderer.on('translate', (event, message) => {
+            webviewGoogle.executeJavaScript('translate("' + message.replace('"', '\"') + '")')
         })
     },
 }
