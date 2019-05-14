@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { remote } from 'electron'
+import { remote, ipcRenderer } from 'electron'
 
 export default {
     name: 'youtube',
@@ -34,6 +34,14 @@ export default {
             }
 
             webview.executeJavaScript('__myYoutubeTools.pauseVideo()')
+        })
+
+        ipcRenderer.on('play-control', (event, message) => {
+            if (message === 'play') {
+                webview.executeJavaScript('__myYoutubeTools.playVideo()')
+            } else if (message === 'pause') {
+                webview.executeJavaScript('__myYoutubeTools.pauseVideo()')
+            }
         })
 
         document.querySelector('#pause').onclick = function() {
