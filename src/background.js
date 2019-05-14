@@ -39,7 +39,7 @@ function pause() {
 function createWindow() {
     // Create the browser window.
     win = new BrowserWindow({
-        width: 1200,
+        width: 800,
         height: 750,
         icon: path.join(__static, 'icon.png'),
         // titleBarStyle: 'hiddenInset',
