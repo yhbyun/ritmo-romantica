@@ -1,7 +1,7 @@
 'use strict'
 /* global __static */
 
-import { app, protocol, BrowserWindow, ipcMain, Menu, Tray, nativeImage } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain, Menu, Tray, nativeImage, globalShortcut } from 'electron'
 import {
     createProtocol,
     installVueDevtools
@@ -19,15 +19,17 @@ let config = {
     alwaysOnTop: false,
     ignoreMouseEvent: false,
 }
+let contextMenu
 
 // Standard scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true, standard: true } }])
 
 function createTray() {
     tray = new Tray(nativeImage.createEmpty())
+    tray.setTitle('Ritmo Rómantica')
     tray.setToolTip('Ritmo Rómantica')
 
-    const contextMenu = Menu.buildFromTemplate([
+    contextMenu = Menu.buildFromTemplate([
         { label: 'Play', click() { play() } },
         { label: 'Pause', click() { pause() } },
         { type: 'separator' },
@@ -35,13 +37,11 @@ function createTray() {
             submenu: [
                 {
                     label: 'Enabled',
+                    id: 'transparency',
                     type: 'checkbox',
-                    accelerator: process.platform === 'darwin' ? 'Command+T' : 'Ctrl+T',
+                    accelerator: process.platform === 'darwin' ? 'Command+Ctrl+Shift+O' : 'Ctrl+T',
                     checked: config.transparency,
-                    click: (item) => {
-                        toggleTransparency()
-                        item.checked = config.transparency
-                    },
+                    click: () => toggleTransparency(),
                 },
                 { label: 'Opacity',
                     submenu: [
@@ -61,23 +61,22 @@ function createTray() {
         },
         {
             label: 'Always on top',
+            id: 'alwaysontop',
             type: 'checkbox',
+            accelerator: process.platform === 'darwin' ? 'Command+Ctrl+Shift+A' : 'Ctrl+A',
             checked: config.alwaysOnTop,
-            click: (item) => {
-                toggleAlwaysOnTop()
-                item.checked = config.alwaysOnTop
-            },
+            click: () => toggleAlwaysOnTop(),
         },
         {
             label: 'Disable Mouse',
+            id: 'ignore-mouse-event',
             type: 'checkbox',
+            accelerator: process.platform === 'darwin' ? 'Command+Ctrl+Shift+M' : 'Ctrl+A',
             checked: config.ignoreMouseEvent,
-            click: (item) => {
-                config.ignoreMouseEvent = !config.ignoreMouseEvent
-                win.setIgnoreMouseEvents(config.ignoreMouseEvent)
-                item.checked = config.ignoreMouseEvent
-            },
+            click: () => toggleIgnoreMouseEvent(),
         },
+        { type: 'separator' },
+        { role: 'close' },
     ])
     tray.setContextMenu(contextMenu)
 }
@@ -93,11 +92,19 @@ function pause() {
 function toggleTransparency() {
     config.transparency = !config.transparency
     config.transparency ? win.setOpacity(config.opacity) : win.setOpacity(0.98)
+    contextMenu.getMenuItemById('transparency').checked = config.transparency
 }
 
 function toggleAlwaysOnTop() {
     config.alwaysOnTop = !config.alwaysOnTop
     config.alwaysOnTop ? alwaysOnTop() : DisablealwaysOnTop(0)
+    contextMenu.getMenuItemById('alwaysontop').checked = config.alwaysOnTop
+}
+
+function toggleIgnoreMouseEvent() {
+    config.ignoreMouseEvent = !config.ignoreMouseEvent
+    win.setIgnoreMouseEvents(config.ignoreMouseEvent)
+    contextMenu.getMenuItemById('ignore-mouse-event').checked = config.ignoreMouseEvent
 }
 
 function setOpacity(item, opacity) {
@@ -154,10 +161,10 @@ function createWindow() {
     // })
 
     // change user agent
-    win.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
-        details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (iPad; CPU OS 9_1 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/73.0.3683.103 Mobile/13B143 Safari/601.1.46'
-        callback({ cancel: false, requestHeaders: details.requestHeaders })
-    })
+    // win.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+    //     details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (iPad; CPU OS 9_1 like Mac OS X) AppleWebKit/601.1 (KHTML, like Gecko) CriOS/73.0.3683.103 Mobile/13B143 Safari/601.1.46'
+    //     callback({ cancel: false, requestHeaders: details.requestHeaders })
+    // })
 
     if (isDevelopment) {
         // Load the url of the dev server if in development mode
@@ -203,6 +210,14 @@ app.on('ready', async () => {
 
     createTray()
     createWindow()
+
+    globalShortcut.register('Cmd+Ctrl+Shift+O', () => toggleTransparency())
+    globalShortcut.register('Cmd+Ctrl+Shift+M', () => toggleIgnoreMouseEvent())
+    globalShortcut.register('Cmd+Ctrl+Shift+A', () => toggleAlwaysOnTop())
+})
+
+app.on('will-quit', () => {
+    globalShortcut.unregisterAll()
 })
 
 // Exit cleanly on request from parent process in development mode.
@@ -220,6 +235,7 @@ if (isDevelopment) {
     }
 }
 
+// IPC
 ipcMain.on('song-updated', (event, arg) => {
     tray.setTitle(arg)
     win.webContents.send('translate', arg.split('-')[1].trim())
