@@ -39,6 +39,7 @@
 
 <script>
     import {TweenMax, Power4} from 'gsap'
+
     export default {
         name: 'sidebar',
         mounted () {
