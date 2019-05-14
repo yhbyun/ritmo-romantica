@@ -15,6 +15,11 @@ import SidebarToggle from '@/components/SidebarToggle.vue'
 export default {
     components: {
         Sidebar, SidebarToggle
+    },
+    watch: {
+        '$route' () {
+            this.$store.dispatch('toggleSidebar')
+        }
     }
 }
 </script>

@@ -27,6 +27,9 @@ yarn electron:build
 - [x] 재생, 중시 tray 메뉴
 - [x] Always on top, Transparency tray Menu
 - [x] Shortcut key 지원
+- [x] sidebar 메뉴 클릭시 sidebar 닫기
+- [ ] 노래제목으로 youtube 검색하기
+- [ ] youtube mp3 download
 - [ ] 음악 재생 알림 시 제목 영문 번역도 달기
 - [ ] quizlet 페이지
 - [ ] spanish101.com
