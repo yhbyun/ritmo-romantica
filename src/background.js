@@ -13,6 +13,11 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 // be closed automatically when the JavaScript object is garbage collected.
 let win
 let tray
+let config = {
+    transparency: false,
+    opacity: 0.3,
+    alwaysOnTop: false,
+}
 
 // Standard scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true, standard: true } }])
@@ -24,6 +29,44 @@ function createTray() {
     const contextMenu = Menu.buildFromTemplate([
         { label: 'Play', click() { play() } },
         { label: 'Pause', click() { pause() } },
+        { type: 'separator' },
+        { label: 'Transparency',
+            submenu: [
+                {
+                    label: 'Enabled',
+                    type: 'checkbox',
+                    accelerator: process.platform === 'darwin' ? 'Command+T' : 'Ctrl+T',
+                    checked: config.transparency,
+                    click: (item) => {
+                        toggleTransparency()
+                        item.checked = config.transparency
+                    },
+                },
+                { label: 'Opacity',
+                    submenu: [
+                        { label: '10%', type: 'radio', checked: config.opacity === 0.1, click(item) { setOpacity(item, 0.1) } },
+                        { label: '20%', type: 'radio', checked: config.opacity === 0.2, click(item) { setOpacity(item, 0.2) } },
+                        { label: '30%', type: 'radio', checked: config.opacity === 0.3, click(item) { setOpacity(item, 0.3) } },
+                        { label: '40%', type: 'radio', checked: config.opacity === 0.4, click(item) { setOpacity(item, 0.4) } },
+                        { label: '50%', type: 'radio', checked: config.opacity === 0.5, click(item) { setOpacity(item, 0.5) } },
+                        { label: '60%', type: 'radio', checked: config.opacity === 0.6 , click(item) { setOpacity(item, 0.6) } },
+                        { label: '70%', type: 'radio', checked: config.opacity === 0.7, click(item) { setOpacity(item, 0.7) } },
+                        { label: '80%', type: 'radio', checked: config.opacity === 0.8, click(item) { setOpacity(item, 0.8) } },
+                        { label: '90%', type: 'radio', checked: config.opacity === 0.9, click(item) { setOpacity(item, 0.9) } },
+                        { label: '100%', type: 'radio', checked: config.opacity === 0.98, click(item) { setOpacity(item, 0.98) } },
+                    ],
+                },
+            ]
+        },
+        {
+            label: 'Always on top',
+            type: 'checkbox',
+            checked: config.alwaysOnTop,
+            click: (item) => {
+                toggleAlwaysOnTop()
+                item.checked = config.alwaysOnTop
+            },
+        },
     ])
     tray.setContextMenu(contextMenu)
 }
@@ -34,6 +77,39 @@ function play() {
 
 function pause() {
     win.webContents.send('play-control', 'pause')
+}
+
+function toggleTransparency() {
+    config.transparency = !config.transparency
+    config.transparency ? win.setOpacity(config.opacity) : win.setOpacity(0.98)
+}
+
+function toggleAlwaysOnTop() {
+    config.alwaysOnTop = !config.alwaysOnTop
+    config.alwaysOnTop ? alwaysOnTop() : DisablealwaysOnTop(0)
+}
+
+function setOpacity(item, opacity) {
+    item.checked = true
+    config.opacity = opacity
+    win.setOpacity(config.opacity)
+}
+
+function alwaysOnTop() {
+    // hides the dock icon for our app which allows our windows to join other
+    // apps' spaces. without this our windows open on the nearest "desktop" space
+    app.dock.hide()
+    // "floating" + 1 is higher than all regular windows, but still behind things
+    // like spotlight or the screen saver
+    win.setAlwaysOnTop(true, "floating", 1)
+    // allows the window to show over a fullscreen window
+    win.setVisibleOnAllWorkspaces(true)
+}
+
+function DisablealwaysOnTop() {
+    app.dock.show()
+    win.setAlwaysOnTop(false)
+    win.setVisibleOnAllWorkspaces(false)
 }
 
 function createWindow() {
@@ -86,20 +162,6 @@ function createWindow() {
         win.removeAllListeners()
         win = null
     })
-}
-
-
-function alwaysOnTop() {
-    win.setOpacity(0.6)
-
-    // hides the dock icon for our app which allows our windows to join other
-    // apps' spaces. without this our windows open on the nearest "desktop" space
-    app.dock.hide()
-    // "floating" + 1 is higher than all regular windows, but still behind things
-    // like spotlight or the screen saver
-    win.setAlwaysOnTop(true, "floating", 1)
-    // allows the window to show over a fullscreen window
-    win.setVisibleOnAllWorkspaces(true)
 }
 
 // Quit when all windows are closed.
