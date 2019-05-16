@@ -12,26 +12,44 @@
 @tailwind preflight;
 
 .router-link-exact-active {
-    @apply bg-grey-darker;
+    @apply bg-gray-700;
 }
 
 .clickable {
-	-webkit-app-region: no-drag;
+    -webkit-app-region: no-drag;
 }
 
 .border-blackblack {
-	border-color: black;
+    border-color: black;
 }
 
+.v--modal-overlay {
+    background: rgba(0,0,0,.5)!important;
+}
+
+/*
 ::-webkit-scrollbar {
-	background-color: #2B2B2B;
-	border-left: 1px solid #3E3E3E;
-	width: .65rem;
+    background-color: #2B2B2B;
+    border-left: 1px solid #3E3E3E;
+    width: .65rem;
 }
 
 ::-webkit-scrollbar-thumb {
-	background:  #6B6B6B;
-	border-radius: 10px;
+    background:  #6B6B6B;
+    border-radius: 10px;
+}
+*/
+
+.btn {
+    @apply font-bold py-2 px-4 m-1 rounded;
+}
+
+.btn-blue {
+    @apply bg-blue-500 text-white;
+}
+
+.btn-blue:hover {
+    @apply bg-blue-600;
 }
 
 /**
