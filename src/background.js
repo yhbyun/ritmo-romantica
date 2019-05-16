@@ -169,12 +169,65 @@ function createWindow() {
     if (isDevelopment) {
         // Load the url of the dev server if in development mode
         win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
-        if (!process.env.IS_TEST) win.webContents.openDevTools()
+        // if (!process.env.IS_TEST) win.webContents.openDevTools()
     } else {
         createProtocol('app')
         // Load the index.html when not in development
         win.loadFile('index.html')
     }
+
+    let template = [
+        {
+            label: 'Ritmo Rómantica',
+            submenu: [
+                {label: 'About Application', selector: 'orderFrontStandardAboutPanel:'},
+                {type: 'separator'},
+                {
+                    label: 'Quit',
+                    accelerator: 'Command+Q',
+                    click: function() {
+                        app.quit();
+                    }
+                }
+            ]
+        },
+        {
+            label: 'Edit',
+            submenu: [
+                {role: 'Reload', accelerator: 'CmdOrCtrl+R', selector: 'reload:'},
+                {label: 'Undo', accelerator: 'CmdOrCtrl+Z', selector: 'undo:'},
+                {label: 'Redo', accelerator: 'Shift+CmdOrCtrl+Z', selector: 'redo:'},
+                {type: 'separator'},
+                {label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:'},
+                {label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:'},
+                {label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:'}
+            ]
+        },
+        {
+            label: 'Preferences',
+            submenu: [
+                {
+                    label: 'Download Folder',
+                    click: () => win.webContents.send('promptForChangeDownloadFolder'),
+                },
+            ]
+        }
+    ]
+
+    // If developing add dev menu option to menu bar
+    if (isDevelopment) {
+        template.push({
+            label: 'Dev Options',
+            submenu: [
+                {
+                    label: 'Open Dev Tools',
+                    click: () => win.webContents.openDevTools(),
+                }
+            ]
+        })
+    }
+
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 
     win.on('closed', () => {
         win.removeAllListeners()
