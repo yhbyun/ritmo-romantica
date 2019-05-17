@@ -140,6 +140,7 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true, // fix require is not defined errors
             webviewTag: true, // enable webview tag
+            nativeWindowOpen: true, // enable window.open
         },
     })
     win.setOpacity(0.98)

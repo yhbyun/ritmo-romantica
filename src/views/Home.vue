@@ -45,7 +45,9 @@
 <script>
 /* global __static */
 
-import VueGridLayout from 'vue-grid-layout';
+import VueGridLayout from 'vue-grid-layout'
+import request from 'request-promise'
+import cheerio from 'cheerio'
 import { remote, ipcRenderer } from 'electron'
 const { Menu, MenuItem } = remote
 
@@ -94,6 +96,15 @@ export default {
                 label: 'Search this song in YouTube',
                 click: () => this.$router.push({ path: '/youtube', query: { search_query: this.song }}),
             }))
+            menu.append(new MenuItem({
+                label: 'Search lyric',
+                click: () => {
+                    this.getLyric(this.song).then(lyric => {
+                        let modal = window.open('', 'lyric')
+                        modal.document.write(lyric)
+                    })
+                }
+            }))
             menu.popup(remote.getCurrentWindow())
         })
 
@@ -109,6 +120,41 @@ export default {
             this.song = message
             webviewGoogle.executeJavaScript('translateSong("' + message.replace('"', '\\"') + '")')
         })
+    },
+    methods: {
+        getLyric: async song => {
+            console.log('getLyrics', song)
+            let query = song + ' site:https://www.letras.com'
+            let url = "https://www.google.com/search?q=" + encodeURIComponent(query)
+            let lyricUrl
+
+            let response = await request(url)
+            let $ = cheerio.load(response)
+            //Now Scrap the first google link
+            //$('.r','a').children[0].href
+            const links = $('a','.r') //Get All Links
+            $(links).each(function (i, link) {
+                const text = $(link).text()
+                console.log(text)
+                if (text.search("LETRAS.COM") !== -1) {
+                    console.log($(link).attr('href'))
+                    //lyricUrl = $(link).attr('href').substring(7)
+                    lyricUrl = 'https://www.google.com' + $(link).attr('href')
+                    console.log(lyricUrl)
+                    return false //break the loop each
+                }
+            })
+
+            if (!lyricUrl || lyricUrl.length < 3) {
+                console.error('Lyrics not found')
+                return;
+            }
+
+            response = await request(lyricUrl)
+            $ = cheerio.load(response)
+            const data = $('.cnt-letra')
+            return data.html()
+        },
     },
 }
 </script>
