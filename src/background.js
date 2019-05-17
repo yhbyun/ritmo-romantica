@@ -291,6 +291,5 @@ if (isDevelopment) {
 // IPC
 ipcMain.on('song-updated', (event, arg) => {
     tray.setTitle(arg)
-    win.webContents.send('translate', arg.split('-')[1].trim())
     win.webContents.send('song-updated', arg);
 })

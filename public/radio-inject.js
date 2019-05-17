@@ -14,7 +14,7 @@ onload = () => {
                 if (mutation.target.id === 'titletext' ||
                     (mutation.target.id === 'status' && text === 'Status: On Air')) {
                     const msg = songMessage(artistElement.textContent, titleElement.textContent)
-                    notify(msg)
+                    notifySongUpdated(msg)
                 }
             } else if (mutation.type == 'attributes') {
                 // console.log('The ' + mutation.attributeName + ' attribute was modified.')
@@ -22,6 +22,7 @@ onload = () => {
         }
     };
 
+    // Detect song change
     const titleElement = document.querySelector('#titletext')
     const artistElement = document.querySelector('#artisttext')
     const statusElement = document.querySelector('#status')
@@ -36,7 +37,7 @@ onload = () => {
 
     if (statusElement.textContent.trim() === 'Status: On Air') {
         const msg = songMessage(artistElement.textContent, titleElement.textContent)
-        notify(msg)
+        notifySongUpdated(msg)
     }
 
     // mouse right button click
@@ -47,14 +48,9 @@ const songMessage = function (song, singer) {
     return song + ' - ' + singer;
 }
 
-const notify = function (msg) {
-    // send main process
+const notifySongUpdated = function (msg) {
+    // send song-updated message to main process
     ipcRenderer.send('song-updated', msg)
-
-    // html5 notification
-    new Notification('Now Playing', {
-        body: msg
-    })
 }
 
 playControl = {

@@ -107,10 +107,7 @@ export default {
 
         ipcRenderer.on('song-updated', (event, message) => {
             this.song = message
-        })
-
-        ipcRenderer.on('translate', (event, message) => {
-            webviewGoogle.executeJavaScript('translate("' + message.replace('"', '\\"') + '")')
+            webviewGoogle.executeJavaScript('translateSong("' + message.replace('"', '\\"') + '")')
         })
     },
 }
