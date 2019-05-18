@@ -37,6 +37,17 @@
                     allowpopups
                     ></webview>
             </div>
+            <div class="w-full h-full bg-white p-4" v-else-if="item.i === '3'">
+                <scroll class="lyric-wrapper w-full h-full overflow-auto" ref="lyricList" :data="currentLyric && currentLyric.lines">
+                    <div>
+                        <div v-if="currentLyric">
+                            <p v-for="(line, index) in currentLyric.lines" ref="lyricLine" :key="index"
+                                :class="{ 'current': currentLineNum === index }"
+                                class="text" v-html="line.txt"></p>
+                        </div>
+                    </div>
+                </scroll>
+            </div>
         </grid-item>
     </grid-layout>
 
@@ -50,11 +61,14 @@ import request from 'request-promise'
 import cheerio from 'cheerio'
 import { remote, ipcRenderer } from 'electron'
 const { Menu, MenuItem } = remote
+import Scroll from '@/components/Scroll.vue'
+import Lyric from './Lyric.js'
 
 const layout = [
-    {"x":0,"y":0,"w":6,"h":18,"i":"0"},
+    {"x":0,"y":0,"w":6,"h":13,"i":"0"},
     {"x":6,"y":0,"w":6,"h":9,"i":"1"},
     {"x":6,"y":9,"w":6,"h":9,"i":"2"},
+    {"x":0,"y":13,"w":6,"h":5,"i":"3"},
 ];
 
 // @ is an alias to /src
@@ -62,14 +76,18 @@ export default {
     name: 'home',
     components: {
         GridLayout: VueGridLayout.GridLayout,
-        GridItem: VueGridLayout.GridItem
+        GridItem: VueGridLayout.GridItem,
+        Scroll,
     },
     data: function () {
         return {
             layout: layout,
             preloadRadio: `file:${require('path').resolve(__static, './radio-inject.js')}`,
             preloadGoogle: `file:${require('path').resolve(__static, './google-translate-inject.js')}`,
-            song: '', // singer + ' - ' + song
+            song: '', // singer + ' - ' + song,
+            currentLyric: null,
+            currentLineNum: 0,
+            showLyric: localStorage.getItem('showLyric') ? (localStorage.getItem('showLyric') === 'true') : true,
         }
     },
     mounted () {
@@ -98,12 +116,7 @@ export default {
             }))
             menu.append(new MenuItem({
                 label: 'Search lyric',
-                click: () => {
-                    this.getLyric(this.song).then(lyric => {
-                        let modal = window.open('', 'lyric')
-                        modal.document.write(lyric)
-                    })
-                }
+                click: () => this.displayLyric(),
             }))
             menu.popup(remote.getCurrentWindow())
         })
@@ -119,9 +132,37 @@ export default {
         ipcRenderer.on('song-updated', (event, message) => {
             this.song = message
             webviewGoogle.executeJavaScript('translateSong("' + message.replace('"', '\\"') + '")')
+            this.displayLyric()
+        })
+
+        ipcRenderer.on('showlyric-changed', (event, show) => {
+            this.showLyric = show
+            localStorage.setItem('showLyric', show);
         })
     },
     methods: {
+        displayLyric() {
+            if (!this.showLyric || this.song.indexOf('Radio Ritmo Romántica') >= 0) return;
+
+            try {
+                this.getLyric(this.song).then(lyric => {
+                    console.log(lyric)
+                    this.currentLyric = new Lyric(lyric)
+
+                    /*
+                    // auto scroll
+                    setInterval(() => {
+                        const lineEl = this.$refs.lyricLine[this.currentLineNum]
+                        this.$refs.lyricList[0].scrollToElement(lineEl, 1000)
+                        this.currentLineNum++
+                    }, 1000)
+                    */
+                })
+            } catch (error) {
+                const lyric = `<span class="text-red-500">${error}</span>`
+                this.currentLyric = new Lyric(lyric)
+            }
+        },
         getLyric: async song => {
             console.log('getLyrics', song)
             let query = song + ' site:https://www.letras.com'
@@ -145,15 +186,22 @@ export default {
                 }
             })
 
-            if (!lyricUrl || lyricUrl.length < 3) {
+            if (!lyricUrl) {
                 console.error('Lyrics not found')
-                return;
+                throw Error('Lyrics not found')
             }
 
             response = await request(lyricUrl)
             $ = cheerio.load(response)
             const data = $('.cnt-letra')
-            return data.html()
+            let html = data.html()
+            if (!html) {
+                console.error('Lyrics div not found')
+                throw Error('Lyrics div not found')
+            }
+            html = html.replace(/<p>(.*)<\/p>/g, "$1<br>")
+            html = `<span class="text-blue-500 font-bold">${song}</span><br>${html}`
+            return html.replace(/<br>/g, '\n')
         },
     },
 }

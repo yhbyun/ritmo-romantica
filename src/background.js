@@ -18,6 +18,7 @@ let config = {
     opacity: 0.3,
     alwaysOnTop: false,
     ignoreMouseEvent: false,
+    showLyric: true,
 }
 let contextMenu
 
@@ -105,6 +106,11 @@ function toggleIgnoreMouseEvent() {
     config.ignoreMouseEvent = !config.ignoreMouseEvent
     win.setIgnoreMouseEvents(config.ignoreMouseEvent)
     contextMenu.getMenuItemById('ignore-mouse-event').checked = config.ignoreMouseEvent
+}
+
+function toggleShowLyric() {
+    config.showLyric = !config.showLyric
+    win.webContents.send('showlyric-changed', config.showLyric)
 }
 
 function setOpacity(item, opacity) {
@@ -210,6 +216,12 @@ function createWindow() {
                 {
                     label: 'Download Folder',
                     click: () => win.webContents.send('promptForChangeDownloadFolder'),
+                },
+                {
+                    label: 'Show Lyric',
+                    type: 'checkbox',
+                    checked: config.showLyric,
+                    click: () => toggleShowLyric(),
                 },
             ]
         }
