@@ -35,6 +35,7 @@ import * as path from 'path'
 import sanitize from 'sanitize-filename'
 import ytdl from 'ytdl-core'
 import fs from 'fs-extra'
+import { config } from '../config.js'
 
 export default {
     name: 'youtube',
@@ -47,9 +48,7 @@ export default {
             showProgressBar: false,
             progress: 0,
             progressMessage: '',
-            userDownloadsFolder: localStorage.getItem('userSelectedFolder')
-                ? localStorage.getItem('userSelectedFolder')
-                : remote.app.getPath('downloads'),
+            userDownloadsFolder: config.get('userSelectedFolder') ? config.get('userSelectedFolder') : remote.app.getPath('downloads'),
             rateLimitTriggered: false,
             url: this.$route.query.search_query ? `https://www.youtube.com/results?search_query=${this.$route.query.search_query}` : 'https://www.youtube.com/',
             mp3Path: '',
@@ -192,10 +191,10 @@ export default {
                 title: 'Select folder to store files.'
             })
 
-            // If a folder was selected and not just closed, set the localStorage value to that path and adjust the state.
+            // If a folder was selected and not just closed, set the config value to that path and adjust the state.
             if (fileSelector) {
                 let pathToStore = fileSelector[0]
-                localStorage.setItem('userSelectedFolder', pathToStore)
+                config.set('userSelectedFolder', pathToStore)
                 this.userDownloadsFolder = pathToStore
             }
         },

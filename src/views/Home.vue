@@ -63,6 +63,7 @@ import { remote, ipcRenderer } from 'electron'
 const { Menu, MenuItem } = remote
 import Scroll from '@/components/Scroll.vue'
 import Lyric from './Lyric.js'
+import { config } from '../config.js'
 
 const layout = [
     {"x":0,"y":0,"w":6,"h":13,"i":"0"},
@@ -87,7 +88,7 @@ export default {
             song: '', // singer + ' - ' + song,
             currentLyric: null,
             currentLineNum: 0,
-            showLyric: localStorage.getItem('showLyric') ? (localStorage.getItem('showLyric') === 'true') : true,
+            showLyric: config.get('showLyric', true),
         }
     },
     mounted () {
@@ -137,7 +138,6 @@ export default {
 
         ipcRenderer.on('showlyric-changed', (event, show) => {
             this.showLyric = show
-            localStorage.setItem('showLyric', show);
         })
     },
     methods: {

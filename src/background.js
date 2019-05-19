@@ -7,19 +7,14 @@ import {
     installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
 import path from 'path'
+import { config } from './config.js'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
 let tray
-let config = {
-    transparency: false,
-    opacity: 0.3,
-    alwaysOnTop: false,
-    ignoreMouseEvent: false,
-    showLyric: true,
-}
+let settings
 let contextMenu
 
 // Standard scheme must be registered before the app is ready
@@ -41,21 +36,21 @@ function createTray() {
                     id: 'transparency',
                     type: 'checkbox',
                     accelerator: process.platform === 'darwin' ? 'Command+Ctrl+Shift+O' : 'Ctrl+T',
-                    checked: config.transparency,
+                    checked: settings.transparency,
                     click: () => toggleTransparency(),
                 },
                 { label: 'Opacity',
                     submenu: [
-                        { label: '10%', type: 'radio', checked: config.opacity === 0.1, click(item) { setOpacity(item, 0.1) } },
-                        { label: '20%', type: 'radio', checked: config.opacity === 0.2, click(item) { setOpacity(item, 0.2) } },
-                        { label: '30%', type: 'radio', checked: config.opacity === 0.3, click(item) { setOpacity(item, 0.3) } },
-                        { label: '40%', type: 'radio', checked: config.opacity === 0.4, click(item) { setOpacity(item, 0.4) } },
-                        { label: '50%', type: 'radio', checked: config.opacity === 0.5, click(item) { setOpacity(item, 0.5) } },
-                        { label: '60%', type: 'radio', checked: config.opacity === 0.6 , click(item) { setOpacity(item, 0.6) } },
-                        { label: '70%', type: 'radio', checked: config.opacity === 0.7, click(item) { setOpacity(item, 0.7) } },
-                        { label: '80%', type: 'radio', checked: config.opacity === 0.8, click(item) { setOpacity(item, 0.8) } },
-                        { label: '90%', type: 'radio', checked: config.opacity === 0.9, click(item) { setOpacity(item, 0.9) } },
-                        { label: '100%', type: 'radio', checked: config.opacity === 0.98, click(item) { setOpacity(item, 0.98) } },
+                        { label: '10%', type: 'radio', checked: settings.opacity === 0.1, click(item) { setOpacity(item, 0.1) } },
+                        { label: '20%', type: 'radio', checked: settings.opacity === 0.2, click(item) { setOpacity(item, 0.2) } },
+                        { label: '30%', type: 'radio', checked: settings.opacity === 0.3, click(item) { setOpacity(item, 0.3) } },
+                        { label: '40%', type: 'radio', checked: settings.opacity === 0.4, click(item) { setOpacity(item, 0.4) } },
+                        { label: '50%', type: 'radio', checked: settings.opacity === 0.5, click(item) { setOpacity(item, 0.5) } },
+                        { label: '60%', type: 'radio', checked: settings.opacity === 0.6 , click(item) { setOpacity(item, 0.6) } },
+                        { label: '70%', type: 'radio', checked: settings.opacity === 0.7, click(item) { setOpacity(item, 0.7) } },
+                        { label: '80%', type: 'radio', checked: settings.opacity === 0.8, click(item) { setOpacity(item, 0.8) } },
+                        { label: '90%', type: 'radio', checked: settings.opacity === 0.9, click(item) { setOpacity(item, 0.9) } },
+                        { label: '100%', type: 'radio', checked: settings.opacity === 0.98, click(item) { setOpacity(item, 0.98) } },
                     ],
                 },
             ]
@@ -65,7 +60,7 @@ function createTray() {
             id: 'alwaysontop',
             type: 'checkbox',
             accelerator: process.platform === 'darwin' ? 'Command+Ctrl+Shift+A' : 'Ctrl+A',
-            checked: config.alwaysOnTop,
+            checked: settings.alwaysOnTop,
             click: () => toggleAlwaysOnTop(),
         },
         {
@@ -73,7 +68,7 @@ function createTray() {
             id: 'ignore-mouse-event',
             type: 'checkbox',
             accelerator: process.platform === 'darwin' ? 'Command+Ctrl+Shift+M' : 'Ctrl+A',
-            checked: config.ignoreMouseEvent,
+            checked: settings.ignoreMouseEvent,
             click: () => toggleIgnoreMouseEvent(),
         },
         { type: 'separator' },
@@ -91,32 +86,41 @@ function pause() {
 }
 
 function toggleTransparency() {
-    config.transparency = !config.transparency
-    config.transparency ? win.setOpacity(config.opacity) : win.setOpacity(0.98)
-    contextMenu.getMenuItemById('transparency').checked = config.transparency
+    settings.transparency = !settings.transparency
+    config.set('transparency', settings.transparency)
+
+    settings.transparency ? win.setOpacity(settings.opacity) : win.setOpacity(0.98)
+    contextMenu.getMenuItemById('transparency').checked = settings.transparency
 }
 
 function toggleAlwaysOnTop() {
-    config.alwaysOnTop = !config.alwaysOnTop
-    config.alwaysOnTop ? alwaysOnTop() : DisablealwaysOnTop(0)
-    contextMenu.getMenuItemById('alwaysontop').checked = config.alwaysOnTop
+    settings.alwaysOnTop = !settings.alwaysOnTop
+    config.set('alwaysOnTop', settings.alwaysOnTop)
+
+    settings.alwaysOnTop ? alwaysOnTop() : DisablealwaysOnTop(0)
+    contextMenu.getMenuItemById('alwaysontop').checked = settings.alwaysOnTop
 }
 
 function toggleIgnoreMouseEvent() {
-    config.ignoreMouseEvent = !config.ignoreMouseEvent
-    win.setIgnoreMouseEvents(config.ignoreMouseEvent)
-    contextMenu.getMenuItemById('ignore-mouse-event').checked = config.ignoreMouseEvent
+    settings.ignoreMouseEvent = !settings.ignoreMouseEvent
+    config.set('ignoreMouseEvent', settings.ignoreMouseEvent)
+
+    win.setIgnoreMouseEvents(settings.ignoreMouseEvent)
+    contextMenu.getMenuItemById('ignore-mouse-event').checked = settings.ignoreMouseEvent
 }
 
 function toggleShowLyric() {
-    config.showLyric = !config.showLyric
-    win.webContents.send('showlyric-changed', config.showLyric)
+    settings.showLyric = !settings.showLyric
+    config.set('showLyric', settings.showLyric)
+
+    win.webContents.send('showlyric-changed', settings.showLyric)
 }
 
 function setOpacity(item, opacity) {
     item.checked = true
-    config.opacity = opacity
-    win.setOpacity(config.opacity)
+    settings.opacity = opacity
+    config.set('opacity', settings.opacity)
+    win.setOpacity(settings.opacity)
 }
 
 function alwaysOnTop() {
@@ -149,9 +153,10 @@ function createWindow() {
             nativeWindowOpen: true, // enable window.open
         },
     })
-    win.setOpacity(0.98)
 
-    // alwaysOnTop()
+    settings.transparency ? win.setOpacity(settings.opacity) : win.setOpacity(0.98)
+    if (settings.alwaysOnTop) alwaysOnTop()
+    win.setIgnoreMouseEvents(settings.ignoreMouseEvent)
 
     // ignore x-frame-options & contect-security-policy
     // win.webContents.session.webRequest.onHeadersReceived({}, (detail, callback) => {
@@ -220,7 +225,7 @@ function createWindow() {
                 {
                     label: 'Show Lyric',
                     type: 'checkbox',
-                    checked: config.showLyric,
+                    checked: settings.showLyric,
                     click: () => toggleShowLyric(),
                 },
             ]
@@ -272,6 +277,14 @@ app.on('ready', async () => {
     if (isDevelopment && !process.env.IS_TEST) {
         // Install Vue Devtools
         await installVueDevtools()
+    }
+
+    settings = {
+        transparency: config.get('transparency', false),
+        opacity: config.get('opacity', 0.3),
+        alwaysOnTop: config.get('alwaysOnTop', false),
+        ignoreMouseEvent: config.get('ignoreMouseEvent', false),
+        showLyric: config.get('showLyric', true),
     }
 
     createTray()
