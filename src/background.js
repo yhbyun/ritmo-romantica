@@ -7,6 +7,7 @@ import {
     installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
 import path from 'path'
+import windowStateKeeper from 'electron-window-state'
 import { config } from './config.js'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -137,10 +138,18 @@ function DisablealwaysOnTop() {
 }
 
 function createWindow() {
+    // Load the previous state with fallback to defaults
+    let mainWindowState = windowStateKeeper({
+        defaultWidth: 800,
+        defaultHeight: 750
+    });
+
     // Create the browser window.
     win = new BrowserWindow({
-        width: 800,
-        height: 750,
+        x: mainWindowState.x,
+        y: mainWindowState.y,
+        width: mainWindowState.width,
+        height: mainWindowState.height,
         icon: path.join(__static, 'icon.png'),
         // titleBarStyle: 'hiddenInset',
         webPreferences: {
@@ -149,6 +158,8 @@ function createWindow() {
             nativeWindowOpen: true, // enable window.open
         },
     })
+
+    mainWindowState.manage(win)
 
     settings.transparency ? win.setOpacity(settings.opacity) : win.setOpacity(0.98)
     if (settings.alwaysOnTop) alwaysOnTop()
