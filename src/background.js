@@ -15,7 +15,6 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 let win
 let tray
 let settings
-let contextMenu
 
 // Standard scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true, standard: true } }])
@@ -25,7 +24,7 @@ function createTray() {
     tray.setTitle('Ritmo Rómantica')
     tray.setToolTip('Ritmo Rómantica')
 
-    contextMenu = Menu.buildFromTemplate([
+    let contextMenu = Menu.buildFromTemplate([
         { label: 'Play', click() { play() } },
         { label: 'Pause', click() { pause() } },
         { type: 'separator' },
@@ -90,7 +89,6 @@ function toggleTransparency() {
     config.set('transparency', settings.transparency)
 
     settings.transparency ? win.setOpacity(settings.opacity) : win.setOpacity(0.98)
-    contextMenu.getMenuItemById('transparency').checked = settings.transparency
 }
 
 function toggleAlwaysOnTop() {
@@ -98,7 +96,6 @@ function toggleAlwaysOnTop() {
     config.set('alwaysOnTop', settings.alwaysOnTop)
 
     settings.alwaysOnTop ? alwaysOnTop() : DisablealwaysOnTop(0)
-    contextMenu.getMenuItemById('alwaysontop').checked = settings.alwaysOnTop
 }
 
 function toggleIgnoreMouseEvent() {
@@ -106,7 +103,6 @@ function toggleIgnoreMouseEvent() {
     config.set('ignoreMouseEvent', settings.ignoreMouseEvent)
 
     win.setIgnoreMouseEvents(settings.ignoreMouseEvent)
-    contextMenu.getMenuItemById('ignore-mouse-event').checked = settings.ignoreMouseEvent
 }
 
 function toggleShowLyric() {
@@ -250,6 +246,7 @@ function createWindow() {
     win.on('closed', () => {
         win.removeAllListeners()
         win = null
+        tray = null
     })
 }
 
