@@ -72,7 +72,7 @@ function createTray() {
             click: () => toggleIgnoreMouseEvent(),
         },
         { type: 'separator' },
-        { role: 'close' },
+        { role: 'quit' },
     ])
     tray.setContextMenu(contextMenu)
 }
