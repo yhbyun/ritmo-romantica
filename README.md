@@ -1,6 +1,6 @@
-![appstore](https://user-images.githubusercontent.com/4316355/48569610-354ed300-e8d0-11e8-8fde-e1d5631528dd.png)
+# ritmo-romántica
 
-# app-store-tailwind
+Listen peruvian raidio `ritmo romantica` with lyrics.
 
 ## Project setup
 ```
@@ -19,8 +19,6 @@ yarn electron:build
 
 ### todo lists
 
-- [ ] 검색 기능 : google translate
-- [ ] 설정 저장
 - [x] 가사 보여주기
 - [ ] 가사 play
 - [x] 제목 자동 번역
@@ -34,6 +32,4 @@ yarn electron:build
 - [x] youtube mp3 download
 - [x] 음악 재생 알림 시 제목 영문 번역도 달기
 - [x] general browser
-- [ ] quizlet 페이지
-- [ ] spanish101.com
 
