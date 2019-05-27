@@ -2,22 +2,19 @@ const {ipcRenderer, remote} = require('electron')
 
 onload = () => {
     // Options for the observer (which mutations to observe)
-    const config = { attributes: true, childList: true, subtree: true }
+    const config = { childList: true, subtree: true }
 
     // Callback function to execute when mutations are observed
     const callback = function (mutationsList) {
         for (const mutation of mutationsList) {
             if (mutation.type == 'childList') {
                 const text = mutation.target.textContent.trim()
-                // console.log(mutation.target, text)
 
                 if (mutation.target.id === 'titletext' ||
                     (mutation.target.id === 'status' && text === 'Status: On Air')) {
                     const msg = songMessage(artistElement.textContent, titleElement.textContent)
                     notifySongUpdated(msg)
                 }
-            } else if (mutation.type == 'attributes') {
-                // console.log('The ' + mutation.attributeName + ' attribute was modified.')
             }
         }
     };
@@ -31,8 +28,6 @@ onload = () => {
     let observer = new MutationObserver(callback)
     // Start observing the target node for configured mutations
     observer.observe(titleElement, config)
-
-    observer = new MutationObserver(callback)
     observer.observe(statusElement, config)
 
     if (statusElement.textContent.trim() === 'Status: On Air') {
@@ -50,7 +45,9 @@ const songMessage = function (song, singer) {
 
 const notifySongUpdated = function (msg) {
     // send song-updated message to main process
-    ipcRenderer.send('song-updated', msg)
+    if (msg !== ' - ') {
+        ipcRenderer.send('song-updated', msg)
+    }
 }
 
 playControl = {
