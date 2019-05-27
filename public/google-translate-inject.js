@@ -9,14 +9,14 @@ translateSong = (song) => {
     console.log('translateSong', song)
     const songTitle = song.split('-')[1].trim()
 
-    const transalteResult = document.querySelector('.tlid-translation.translation')
-    if (!transalteResult) {
+    const translateResult = document.querySelector('.tlid-translation.translation')
+    if (!translateResult) {
         console.error('Can\'t find translate result element')
         return;
     }
 
     let prevResult = ''
-    prevResult = transalteResult.textContent;
+    prevResult = translateResult.textContent;
     console.log('prev result', prevResult)
 
     // Simulate key input
@@ -25,8 +25,8 @@ translateSong = (song) => {
 
     let counter = 0;
     const timer = setInterval(() => {
-        const transalteResult = document.querySelector('.tlid-translation.translation')
-        const result = transalteResult.textContent
+        const translateResult = document.querySelector('.tlid-translation.translation')
+        const result = translateResult.textContent
 
         counter++;
         console.log(`result ${result}, counter ${counter}`)
