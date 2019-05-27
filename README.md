@@ -35,3 +35,6 @@ yarn electron:build
 - [x] 음악 재생 알림 시 제목 영문 번역도 달기
 - [x] general browser
 
+### YouTube download
+
+YouTube download code is exceprted from [leerob/youtube-to-mp3](https://github.com/leerob/youtube-to-mp3). Thank you to Lee Robinson for your wonderful program.
