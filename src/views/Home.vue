@@ -144,59 +144,48 @@ export default {
         displayLyric() {
             if (!this.showLyric || this.song.indexOf('Radio Ritmo Romántica') >= 0) return;
 
-            try {
-                this.getLyric(this.song).then(lyric => {
-                    console.log(lyric)
-                    this.currentLyric = new Lyric(lyric)
+            this.getLyric(this.song).then(lyric => {
+                console.log(lyric)
+                this.currentLyric = new Lyric(lyric)
 
-                    /*
-                    // auto scroll
-                    setInterval(() => {
-                        const lineEl = this.$refs.lyricLine[this.currentLineNum]
-                        this.$refs.lyricList[0].scrollToElement(lineEl, 1000)
-                        this.currentLineNum++
-                    }, 1000)
-                    */
-                })
-            } catch (error) {
+                /*
+                // auto scroll
+                setInterval(() => {
+                    const lineEl = this.$refs.lyricLine[this.currentLineNum]
+                    this.$refs.lyricList[0].scrollToElement(lineEl, 1000)
+                    this.currentLineNum++
+                }, 1000)
+                */
+            })
+            .catch(error => {
                 const lyric = `<span class="text-red-500">${error}</span>`
                 this.currentLyric = new Lyric(lyric)
-            }
+            })
         },
         getLyric: async song => {
             console.log('getLyrics', song)
             let query = song + ' site:https://www.letras.com'
             let url = "https://www.google.com/search?q=" + encodeURIComponent(query)
-            let lyricUrl
+            let lyricUrl;
 
+            // Cannot use cheerio to parse google search result page. Don't know why???
             let response = await request(url)
-            let $ = cheerio.load(response)
-            //Now Scrap the first google link
-            //$('.r','a').children[0].href
-            const links = $('a','.r') //Get All Links
-            $(links).each(function (i, link) {
-                const text = $(link).text()
-                console.log(text)
-                if (text.search("LETRAS.COM") !== -1) {
-                    console.log($(link).attr('href'))
-                    //lyricUrl = $(link).attr('href').substring(7)
-                    lyricUrl = 'https://www.google.com' + $(link).attr('href')
-                    console.log(lyricUrl)
-                    return false //break the loop each
-                }
-            })
+            let start = response.indexOf('<a href="/url?q=')
+            if (start > 0) {
+                let end = response.indexOf('&amp;', start + 9)
+                lyricUrl = response.substring(start + 16, end - 1)
+                console.log(lyricUrl)
+            }
 
             if (!lyricUrl) {
-                console.error('Lyrics not found')
                 throw Error('Lyrics not found')
             }
 
             response = await request(lyricUrl)
-            $ = cheerio.load(response)
+            let $ = cheerio.load(response)
             const data = $('.cnt-letra')
             let html = data.html()
             if (!html) {
-                console.error('Lyrics div not found')
                 throw Error('Lyrics div not found')
             }
             html = html.replace(/<p>(.*)<\/p>/g, "$1<br>")
