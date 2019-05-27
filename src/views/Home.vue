@@ -66,7 +66,7 @@ import cheerio from 'cheerio'
 import { remote, ipcRenderer } from 'electron'
 const { Menu, MenuItem } = remote
 import Scroll from '@/components/Scroll.vue'
-import Lyric from './Lyric.js'
+import Lyric from '@/utils/Lyric.js'
 import { config } from '../config.js'
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/vue-loading.css'

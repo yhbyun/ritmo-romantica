@@ -121,7 +121,7 @@ export default {
             fetchFavicon(url).then(function (fav) {
                 let book = new Bookmark(uuid.v1(), url, fav, title)
                 jsonfile.readFile(bookmarks, function(err, curr) {
-                    if (err) curr = [] 
+                    if (err) curr = []
                     curr.push(book)
                     jsonfile.writeFile(bookmarks, curr, function (err) {
                     })
@@ -135,7 +135,7 @@ export default {
             if (state === 'closed') {
                 popup.innerHTML = ''
                 jsonfile.readFile(bookmarks, function(err, obj) {
-                    if (err) obj = [] 
+                    if (err) obj = []
 
                     if (obj.length !== 0) {
                         for (var i = 0; i < obj.length; i++) {
@@ -190,7 +190,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '_reset.scss';
+@import '@/assets/_reset.scss';
 
 $white: #EEEEEE;
 $blue:  #070F4E;
