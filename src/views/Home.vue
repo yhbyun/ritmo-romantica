@@ -155,7 +155,6 @@ export default {
             this.isLoading = true;
 
             this.getLyric(this.song).then(lyric => {
-                console.log(lyric)
                 this.currentLyric = new Lyric(lyric)
 
                 /*
