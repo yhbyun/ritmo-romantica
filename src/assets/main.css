@@ -11,6 +11,10 @@
  */
 @tailwind preflight;
 
+body {
+    margin:0;
+}
+
 .router-link-exact-active {
     @apply bg-gray-700;
 }
