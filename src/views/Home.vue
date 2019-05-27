@@ -38,6 +38,10 @@
                     ></webview>
             </div>
             <div class="w-full h-full bg-white p-4" v-else-if="item.i === '3'">
+                <loading :active.sync="isLoading"
+                    :can-cancel="false"
+                    :is-full-page="false"
+                    color="#820263"></loading>
                 <scroll class="lyric-wrapper w-full h-full overflow-auto" ref="lyricList" :data="currentLyric && currentLyric.lines">
                     <div>
                         <div v-if="currentLyric">
@@ -64,6 +68,8 @@ const { Menu, MenuItem } = remote
 import Scroll from '@/components/Scroll.vue'
 import Lyric from './Lyric.js'
 import { config } from '../config.js'
+import Loading from 'vue-loading-overlay'
+import 'vue-loading-overlay/dist/vue-loading.css'
 
 const layout = [
     {"x":0,"y":0,"w":6,"h":13,"i":"0"},
@@ -79,6 +85,7 @@ export default {
         GridLayout: VueGridLayout.GridLayout,
         GridItem: VueGridLayout.GridItem,
         Scroll,
+        Loading,
     },
     data: function () {
         return {
@@ -89,6 +96,7 @@ export default {
             currentLyric: null,
             currentLineNum: 0,
             showLyric: config.get('showLyric', true),
+            isLoading: false,
         }
     },
     mounted () {
@@ -144,6 +152,8 @@ export default {
         displayLyric() {
             if (!this.showLyric || this.song.indexOf('Radio Ritmo Romántica') >= 0) return;
 
+            this.isLoading = true;
+
             this.getLyric(this.song).then(lyric => {
                 console.log(lyric)
                 this.currentLyric = new Lyric(lyric)
@@ -161,6 +171,9 @@ export default {
                 const lyric = `<span class="text-red-500">${error}</span>`
                 this.currentLyric = new Lyric(lyric)
             })
+            .finally(() => {
+                this.isLoading = false;
+            })
         },
         getLyric: async song => {
             console.log('getLyrics', song)
@@ -168,7 +181,7 @@ export default {
             let url = "https://www.google.com/search?q=" + encodeURIComponent(query)
             let lyricUrl;
 
-            // Cannot use cheerio to parse google search result page. Don't know why???
+            // Cannot parse google search result page using cheerio. Don't know why???
             let response = await request(url)
             let start = response.indexOf('<a href="/url?q=')
             if (start > 0) {
