@@ -9,14 +9,11 @@ translateSong = (song) => {
     console.log('translateSong', song)
     const songTitle = song.split('-')[1].trim()
 
-    const translateResult = document.querySelector('.tlid-translation.translation')
-    if (!translateResult) {
-        console.error('Can\'t find translate result element')
-        return;
-    }
-
     let prevResult = ''
-    prevResult = translateResult.textContent;
+    const translateResult = document.querySelector('.tlid-translation.translation')
+    if (translateResult) {
+        prevResult = translateResult.textContent;
+    }
     console.log('prev result', prevResult)
 
     // Simulate key input
@@ -25,10 +22,16 @@ translateSong = (song) => {
 
     let counter = 0;
     const timer = setInterval(() => {
+        counter++;
+
         const translateResult = document.querySelector('.tlid-translation.translation')
+        if (!translateResult) {
+            if (counter > 10) clearInterval(timer)
+            return
+        }
+
         const result = translateResult.textContent
 
-        counter++;
         console.log(`result ${result}, counter ${counter}`)
 
         // why `...` string is added ???
