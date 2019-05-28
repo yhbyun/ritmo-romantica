@@ -1,6 +1,6 @@
 # ritmo-romántica
 
-Electron app to listen Peruvian raidio `ritmo romantica` with lyrics.
+Electron app to listen to the Peruvian raidio `ritmo romantica` with lyrics.
 
 ![ritmo-romántica screen capture](https://raw.githubusercontent.com/yhbyun/resources/master/ritmo-romantica/app.png)
 
