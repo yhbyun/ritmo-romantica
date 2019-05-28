@@ -37,20 +37,12 @@
                     allowpopups
                     ></webview>
             </div>
-            <div class="w-full h-full bg-white p-4" v-else-if="item.i === '3'">
+            <div class="lyric-wrapper w-full h-full bg-white p-4 overflow-auto" v-else-if="item.i === '3'">
                 <loading :active.sync="isLoading"
                     :can-cancel="false"
                     :is-full-page="false"
                     color="#820263"></loading>
-                <scroll class="lyric-wrapper w-full h-full overflow-auto" ref="lyricList" :data="currentLyric && currentLyric.lines">
-                    <div>
-                        <div v-if="currentLyric">
-                            <p v-for="(line, index) in currentLyric.lines" ref="lyricLine" :key="index"
-                                :class="{ 'current': currentLineNum === index }"
-                                class="text" v-html="line.txt"></p>
-                        </div>
-                    </div>
-                </scroll>
+                <div v-html="lyric"></div>
             </div>
         </grid-item>
     </grid-layout>
@@ -65,8 +57,6 @@ import request from 'request-promise'
 import cheerio from 'cheerio'
 import { remote, ipcRenderer } from 'electron'
 const { Menu, MenuItem } = remote
-import Scroll from '@/components/Scroll.vue'
-import Lyric from '@/utils/Lyric.js'
 import { config } from '../config.js'
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/vue-loading.css'
@@ -84,7 +74,6 @@ export default {
     components: {
         GridLayout: VueGridLayout.GridLayout,
         GridItem: VueGridLayout.GridItem,
-        Scroll,
         Loading,
     },
     data: function () {
@@ -93,8 +82,7 @@ export default {
             preloadRadio: `file:${require('path').resolve(__static, './radio-inject.js')}`,
             preloadGoogle: `file:${require('path').resolve(__static, './google-translate-inject.js')}`,
             song: '', // singer + ' - ' + song,
-            currentLyric: null,
-            currentLineNum: 0,
+            lyric: '',
             showLyric: config.get('showLyric', true),
             isLoading: false,
         }
@@ -155,20 +143,11 @@ export default {
             this.isLoading = true;
 
             this.getLyric(this.song).then(lyric => {
-                this.currentLyric = new Lyric(lyric)
-
-                /*
-                // auto scroll
-                setInterval(() => {
-                    const lineEl = this.$refs.lyricLine[this.currentLineNum]
-                    this.$refs.lyricList[0].scrollToElement(lineEl, 1000)
-                    this.currentLineNum++
-                }, 1000)
-                */
+                this.lyric = lyric
+                document.querySelector('.lyric-wrapper').scrollTop = 0
             })
             .catch(error => {
-                const lyric = `<span class="text-red-500">${error}</span>`
-                this.currentLyric = new Lyric(lyric)
+                this.lyric = `<div class="text-red-500">${error}</div>`
             })
             .finally(() => {
                 this.isLoading = false;
@@ -186,7 +165,7 @@ export default {
             if (start > 0) {
                 let end = response.indexOf('&amp;', start + 9)
                 lyricUrl = response.substring(start + 16, end - 1)
-                console.log(lyricUrl)
+                console.log('lyric ur', lyricUrl)
             }
 
             if (!lyricUrl) {
@@ -200,9 +179,8 @@ export default {
             if (!html) {
                 throw Error('Lyrics div not found')
             }
-            html = html.replace(/<p>(.*)<\/p>/g, "$1<br>")
-            html = `<span class="text-blue-500 font-bold">${song}</span><br>${html}`
-            return html.replace(/<br>/g, '\n')
+            html = `<div class="text-blue-500 font-bold mb-4">${song}</div>${html}`
+            return html
         },
     },
 }
